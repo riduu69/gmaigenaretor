@@ -1,160 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Premium Gmail Generator</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="theme-color" content="#0f172a"/>
+<meta charset="UTF-8">
+<title>Sequential Gmail DOT Generator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 :root{
   --bg:#020617; --card:rgba(255,255,255,.08);
-  --txt:#e5e7eb; --muted:#94a3b8;
-  --pri:#6366f1; --pri2:#4f46e5;
-}
-.light{
-  --bg:#f8fafc; --card:#ffffff;
-  --txt:#0f172a; --muted:#64748b;
+  --pri:#6366f1; --txt:#e5e7eb; --muted:#94a3b8;
 }
 *{box-sizing:border-box}
 body{
   margin:0; min-height:100vh; color:var(--txt);
-  font-family:Inter,system-ui,-apple-system;
-  background:radial-gradient(1200px 600px at top, #1e1b4b, var(--bg));
+  font-family:system-ui,-apple-system;
+  background:radial-gradient(circle at top,#1e1b4b,var(--bg));
   display:flex; align-items:center; justify-content:center;
 }
-.wrap{width:100%; max-width:430px; padding:18px}
+.wrap{width:100%; max-width:460px; padding:18px}
 .card{
   background:var(--card); backdrop-filter:blur(18px);
   border-radius:22px; padding:22px;
   box-shadow:0 30px 80px rgba(0,0,0,.45);
-  animation:up .8s ease;
 }
-@keyframes up{from{opacity:0;transform:translateY(40px)}to{opacity:1}}
-.h{
-  display:flex; align-items:center; justify-content:space-between;
-}
-.h h1{margin:0; font-size:22px}
-.toggle{
-  border:none; background:transparent; color:var(--txt);
-  cursor:pointer; font-size:18px
-}
-.sub{color:var(--muted); text-align:center; margin:6px 0 14px}
-input,textarea,button{
+h1{text-align:center;margin:0}
+.sub{text-align:center;color:var(--muted);margin:6px 0 16px}
+input,button{
   width:100%; border:none; border-radius:14px;
   padding:14px; font-size:15px; margin-top:12px
 }
-input,textarea{
-  background:#020617; color:#fff; outline:none
-}
-.light input,.light textarea{background:#e5e7eb;color:#0f172a}
+input{background:#020617;color:#fff;outline:none}
 button{
-  background:linear-gradient(135deg,var(--pri),var(--pri2));
-  color:#fff; font-weight:700; cursor:pointer;
-  position:relative; overflow:hidden
+  background:linear-gradient(135deg,#6366f1,#4f46e5);
+  color:#fff;font-weight:700;cursor:pointer;transition:.25s
 }
 button:hover{transform:translateY(-2px)}
-button:active::after{
-  content:""; position:absolute; inset:0; background:#fff; opacity:.2
+.list{margin-top:14px}
+.item{
+  background:#020617;border-radius:12px;padding:10px;
+  margin-bottom:8px;display:flex;justify-content:space-between;gap:10px
 }
-textarea{height:160px; resize:none}
-.footer{opacity:.6; text-align:center; font-size:13px; margin-top:12px}
-
-/* toast */
+.item.used{opacity:.45}
+.badge{font-size:12px;color:#22c55e}
 .toast{
-  position:fixed; left:50%; bottom:20px; transform:translateX(-50%);
-  background:#020617; color:#fff; padding:10px 14px;
-  border-radius:12px; display:none
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:#020617;padding:10px 14px;border-radius:12px;display:none
 }
-.toast.show{display:block; animation:pop .4s ease}
-@keyframes pop{from{opacity:0;transform:translate(-50%,10px)}}
-
-/* popup */
-.pop{
-  position:fixed; inset:0; background:rgba(0,0,0,.65);
-  display:none; align-items:center; justify-content:center
-}
-.pop.show{display:flex}
-.popbox{
-  background:#020617; color:#fff; border-radius:18px;
-  padding:22px; width:90%; max-width:320px; text-align:center;
-  animation:zoom .35s ease
-}
-@keyframes zoom{from{transform:scale(.7);opacity:0}to{opacity:1}}
-.pop a{
-  display:block; margin-top:14px; padding:12px;
-  background:linear-gradient(135deg,var(--pri),var(--pri2));
-  color:#fff; border-radius:12px; text-decoration:none
-}
-.pop .later{margin-top:8px; background:#111827}
+.toast.show{display:block}
+.counter{margin-top:10px;color:var(--muted);text-align:center}
 </style>
 </head>
 
 <body>
 <div class="wrap">
-  <div class="card" id="card">
-    <div class="h">
-      <h1>⚡ Gmail Generator</h1>
-      <button class="toggle" onclick="toggleTheme()">🌗</button>
-    </div>
-    <div class="sub">Premium Edition</div>
+  <div class="card">
+    <h1>⚡ Gmail DOT Generator</h1>
+    <div class="sub">OTP-compatible • Sequential Copy</div>
 
-    <input id="email" placeholder="example@gmail.com" />
-    <input id="count" type="number" value="30" />
+    <input id="email" placeholder="example@gmail.com">
+    <input id="count" type="number" value="100">
 
-    <button onclick="gen()">✨ Generate</button>
+    <button onclick="generate()">Generate</button>
+    <button onclick="copyNext()">✂️ Cut / Copy Next</button>
 
-    <textarea id="out" placeholder="Generated emails..."></textarea>
-
-    <button onclick="copyAll()">📋 Copy All</button>
-
-    <div class="footer">Made by Hridoy • Premium Tool</div>
+    <div class="counter" id="counter">0 / 0 copied</div>
+    <div class="list" id="list"></div>
   </div>
 </div>
 
-<div class="toast" id="toast">Copied successfully ✅</div>
-
-<div class="pop" id="pop">
-  <div class="popbox">
-    <h3>🚀 Join this channel</h3>
-    <p>Premium tools & updates</p>
-    <a href="https://t.me/hridoytech" target="_blank">Join Now</a>
-    <button class="later" onclick="closePop()">Later</button>
-  </div>
-</div>
+<div class="toast" id="toast">Copied ✅</div>
 
 <script>
-const body=document.body, toast=document.getElementById('toast'),
-      pop=document.getElementById('pop');
+let emails = [];
+let idx = 0;
 
-function toggleTheme(){
-  body.classList.toggle('light');
-  localStorage.setItem('theme', body.classList.contains('light')?'l':'d');
-}
-if(localStorage.getItem('theme')==='l') body.classList.add('light');
+function generate(){
+  const email = document.getElementById('email').value.trim();
+  const count = +document.getElementById('count').value;
+  const list  = document.getElementById('list');
+  const counter = document.getElementById('counter');
 
-function gen(){
-  const e=document.getElementById('email').value.trim();
-  const c=+document.getElementById('count').value;
-  const o=document.getElementById('out');
-  if(!e.endsWith('@gmail.com')) return alert('Only Gmail supported');
-  const name=e.replace('@gmail.com','');
-  let r='';
-  for(let i=1;i<=c;i++) r+=`${name}+${i}@gmail.com\n`;
-  o.value=r;
-  if(!localStorage.getItem('joined')){
-    setTimeout(()=>pop.classList.add('show'),600);
+  list.innerHTML = '';
+  emails = [];
+  idx = 0;
+  counter.textContent = `0 / 0 copied`;
+
+  if(!email.endsWith('@gmail.com')){
+    alert('Only Gmail supported');
+    return;
   }
+
+  const base = email.replace('@gmail.com','').replace(/\./g,'');
+  const set = new Set();
+
+  function addDots(str,pos){
+    if(pos===str.length){ set.add(str+'@gmail.com'); return; }
+    addDots(str,pos+1);
+    addDots(str.slice(0,pos+1)+'.'+str.slice(pos+1),pos+2);
+  }
+  addDots(base,0);
+
+  emails = Array.from(set).slice(0,count);
+  counter.textContent = `0 / ${emails.length} copied`;
+
+  emails.forEach((e,i)=>{
+    const div=document.createElement('div');
+    div.className='item';
+    div.id='item-'+i;
+    div.innerHTML=`<span>${e}</span><span class="badge"></span>`;
+    list.appendChild(div);
+  });
 }
-function copyAll(){
-  const o=document.getElementById('out');
-  o.select(); document.execCommand('copy');
-  toast.classList.add('show');
-  setTimeout(()=>toast.classList.remove('show'),1200);
-}
-function closePop(){
-  localStorage.setItem('joined','1');
-  pop.classList.remove('show');
+
+function copyNext(){
+  if(idx >= emails.length){
+    alert('All emails copied ✅');
+    return;
+  }
+  navigator.clipboard.writeText(emails[idx]);
+
+  const item = document.getElementById('item-'+idx);
+  item.classList.add('used');
+  item.querySelector('.badge').textContent = 'copied';
+
+  idx++;
+  document.getElementById('counter').textContent = `${idx} / ${emails.length} copied`;
+
+  const t=document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),900);
 }
 </script>
 </body>
