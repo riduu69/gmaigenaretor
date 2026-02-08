@@ -2,75 +2,123 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Gmail Case Generator</title>
+<title>Premium Gmail Generator</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
+:root{
+  --bg:#020617;
+  --card:rgba(255,255,255,.08);
+  --pri:#4f46e5;
+  --txt:#e5e7eb;
+  --muted:#94a3b8;
+}
+*{box-sizing:border-box}
 body{
-  font-family:Arial,sans-serif;
-  background:#f4f6fb;
-  padding:15px;
+  margin:0; min-height:100vh;
+  font-family:system-ui,-apple-system;
+  background:radial-gradient(circle at top,#1e1b4b,var(--bg));
+  color:var(--txt);
+  display:flex; align-items:center; justify-content:center;
 }
-.box{
-  max-width:520px;
-  margin:auto;
-  background:#fff;
-  padding:15px;
-  border-radius:8px;
+.wrap{width:100%; max-width:480px; padding:16px}
+.card{
+  background:var(--card);
+  backdrop-filter:blur(18px);
+  border-radius:22px;
+  padding:22px;
+  box-shadow:0 30px 80px rgba(0,0,0,.45);
+  animation:up .7s ease;
 }
-h2{text-align:center}
+@keyframes up{
+  from{opacity:0;transform:translateY(40px)}
+  to{opacity:1}
+}
+h1{text-align:center;margin:0}
+.sub{text-align:center;color:var(--muted);margin:6px 0 14px}
+
 input,textarea,button{
-  width:100%;
-  padding:10px;
-  margin-top:10px;
-  font-size:15px;
+  width:100%; border:none; border-radius:14px;
+  padding:14px; font-size:15px; margin-top:12px
+}
+input,textarea{
+  background:#020617;color:white;outline:none
 }
 button{
-  background:#1e88e5;
-  color:#fff;
-  border:none;
-  cursor:pointer;
+  background:linear-gradient(135deg,#6366f1,#4f46e5);
+  color:white;font-weight:700;cursor:pointer;
+  transition:.25s
 }
-textarea{
-  height:160px;
+button:hover{transform:translateY(-2px)}
+textarea{height:140px}
+
+.counter{
+  margin-top:8px;
+  text-align:center;
+  color:var(--muted);
+  font-size:14px;
 }
-small{
-  color:#666;
+
+.list{
+  margin-top:14px;
 }
+.item{
+  background:#020617;
+  border-radius:12px;
+  padding:10px;
+  margin-bottom:8px;
+  display:flex;
+  justify-content:space-between;
+  font-size:14px;
+}
+.item.used{opacity:.45}
+
+.toast{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#020617;
+  padding:10px 14px;
+  border-radius:12px;
+  display:none;
+}
+.toast.show{display:block}
 </style>
 </head>
 
 <body>
+<div class="wrap">
+  <div class="card">
+    <h1>⚡ Gmail Generator</h1>
+    <div class="sub">Premium • Case Variant • Cut One by One</div>
 
-<div class="box">
-  <h2>Gmail Case Generator</h2>
+    <input id="email" placeholder="riduu903@gmail.com">
+    <input id="count" type="number" value="100">
 
-  <label>Enter Gmail address:</label>
-  <input id="email" placeholder="riduu903@gmail.com">
+    <button onclick="generate()">Generate</button>
 
-  <label>How many emails to generate?</label>
-  <input id="count" type="number" value="100">
+    <textarea id="generated" placeholder="Generated emails..."></textarea>
 
-  <button onclick="generate()">Gmail Generator</button>
+    <button onclick="cutNext()">✂️ Gmail CUT NOW</button>
 
-  <label>Generated Emails</label>
-  <textarea id="generated"></textarea>
+    <div class="counter" id="counter">0 / 0 used</div>
 
-  <label>Copied Emails</label>
-  <textarea id="copied"></textarea>
-
-  <button onclick="cutNext()">Gmail CUT NOW</button>
-
-  <small>Made by Hridoy</small>
+    <div class="list" id="list"></div>
+  </div>
 </div>
 
+<div class="toast" id="toast">Copied ✅</div>
+
 <script>
-let list = [];
-let index = 0;
+let mails = [];
+let idx = 0;
 
 function generate(){
   const email = document.getElementById("email").value.trim();
   const count = +document.getElementById("count").value;
+  const gen = document.getElementById("generated");
+  const list = document.getElementById("list");
 
   if(!email.endsWith("@gmail.com")){
     alert("Only Gmail allowed");
@@ -78,34 +126,53 @@ function generate(){
   }
 
   const name = email.replace("@gmail.com","");
-  list = [];
-  index = 0;
+  mails = [];
+  idx = 0;
+  list.innerHTML = "";
 
   for(let i=0;i<count;i++){
-    let result = "";
+    let v="";
     for(let c of name){
-      result += Math.random() > 0.5 ? c.toUpperCase() : c.toLowerCase();
+      v += Math.random()>.5 ? c.toUpperCase() : c.toLowerCase();
     }
-    list.push(result + "@gmail.com");
+    mails.push(v+"@gmail.com");
   }
 
-  document.getElementById("generated").value = list.join("\n");
-  document.getElementById("copied").value = "";
+  gen.value = mails.join("\n");
+  updateCounter();
+
+  mails.forEach((m,i)=>{
+    const d=document.createElement("div");
+    d.className="item";
+    d.id="item-"+i;
+    d.textContent=m;
+    list.appendChild(d);
+  });
 }
 
 function cutNext(){
-  if(index >= list.length){
-    alert("All emails used");
+  if(idx >= mails.length){
+    alert("All mails used");
     return;
   }
+  navigator.clipboard.writeText(mails[idx]);
 
-  const mail = list[index];
-  navigator.clipboard.writeText(mail);
+  document.getElementById("item-"+idx).classList.add("used");
+  idx++;
+  updateCounter();
+  showToast();
+}
 
-  document.getElementById("copied").value += mail + "\n";
-  index++;
+function updateCounter(){
+  document.getElementById("counter").textContent =
+    `${idx} / ${mails.length} used`;
+}
+
+function showToast(){
+  const t=document.getElementById("toast");
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),900);
 }
 </script>
-
 </body>
 </html>
