@@ -7,11 +7,8 @@
 
 <style>
 :root{
-  --bg:#020617;
-  --card:rgba(255,255,255,.08);
-  --pri:#4f46e5;
-  --txt:#e5e7eb;
-  --muted:#94a3b8;
+  --bg:#020617; --card:rgba(255,255,255,.08);
+  --pri:#4f46e5; --txt:#e5e7eb; --muted:#94a3b8;
 }
 *{box-sizing:border-box}
 body{
@@ -23,17 +20,12 @@ body{
 }
 .wrap{width:100%; max-width:480px; padding:16px}
 .card{
-  background:var(--card);
-  backdrop-filter:blur(18px);
-  border-radius:22px;
-  padding:22px;
+  background:var(--card); backdrop-filter:blur(18px);
+  border-radius:22px; padding:22px;
   box-shadow:0 30px 80px rgba(0,0,0,.45);
   animation:up .7s ease;
 }
-@keyframes up{
-  from{opacity:0;transform:translateY(40px)}
-  to{opacity:1}
-}
+@keyframes up{from{opacity:0;transform:translateY(40px)}to{opacity:1}}
 h1{text-align:center;margin:0}
 .sub{text-align:center;color:var(--muted);margin:6px 0 14px}
 
@@ -41,49 +33,47 @@ input,textarea,button{
   width:100%; border:none; border-radius:14px;
   padding:14px; font-size:15px; margin-top:12px
 }
-input,textarea{
-  background:#020617;color:white;outline:none
-}
+input,textarea{background:#020617;color:white;outline:none}
 button{
   background:linear-gradient(135deg,#6366f1,#4f46e5);
-  color:white;font-weight:700;cursor:pointer;
-  transition:.25s
+  color:white;font-weight:700;cursor:pointer;transition:.25s
 }
 button:hover{transform:translateY(-2px)}
 textarea{height:140px}
 
-.counter{
-  margin-top:8px;
-  text-align:center;
-  color:var(--muted);
-  font-size:14px;
-}
-
-.list{
-  margin-top:14px;
-}
+.counter{margin-top:8px;text-align:center;color:var(--muted);font-size:14px}
+.list{margin-top:14px}
 .item{
-  background:#020617;
-  border-radius:12px;
-  padding:10px;
-  margin-bottom:8px;
-  display:flex;
-  justify-content:space-between;
-  font-size:14px;
+  background:#020617;border-radius:12px;padding:10px;
+  margin-bottom:8px;display:flex;justify-content:space-between;font-size:14px
 }
 .item.used{opacity:.45}
 
 .toast{
-  position:fixed;
-  bottom:20px;
-  left:50%;
-  transform:translateX(-50%);
-  background:#020617;
-  padding:10px 14px;
-  border-radius:12px;
-  display:none;
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:#020617;padding:10px 14px;border-radius:12px;display:none
 }
 .toast.show{display:block}
+
+/* POPUP */
+.pop{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);
+  display:none;align-items:center;justify-content:center;z-index:99
+}
+.pop.show{display:flex}
+.popbox{
+  background:#020617;color:white;border-radius:18px;
+  padding:22px;width:90%;max-width:320px;text-align:center;
+  animation:zoom .35s ease
+}
+@keyframes zoom{from{transform:scale(.7);opacity:0}to{opacity:1}}
+.pop a,.pop button{
+  display:block;width:100%;margin-top:10px;padding:12px;
+  border-radius:12px;border:none;font-weight:700;cursor:pointer
+}
+.pop a{background:linear-gradient(135deg,#6366f1,#4f46e5);color:white;text-decoration:none}
+.pop button{background:#111827;color:white}
+.owner{margin-top:10px;font-size:13px;color:#94a3b8}
 </style>
 </head>
 
@@ -103,75 +93,74 @@ textarea{height:140px}
     <button onclick="cutNext()">✂️ Gmail CUT NOW</button>
 
     <div class="counter" id="counter">0 / 0 used</div>
-
     <div class="list" id="list"></div>
   </div>
 </div>
 
 <div class="toast" id="toast">Copied ✅</div>
 
+<!-- TELEGRAM POPUP -->
+<div class="pop" id="pop">
+  <div class="popbox">
+    <h3>🚀 Join our Telegram</h3>
+    <a href="https://t.me/hirdoytech" target="_blank">Join</a>
+    <button onclick="joined()">Joined</button>
+    <div class="owner">Owner: @ridyyt</div>
+  </div>
+</div>
+
 <script>
-let mails = [];
-let idx = 0;
+let mails=[], idx=0;
 
 function generate(){
-  const email = document.getElementById("email").value.trim();
-  const count = +document.getElementById("count").value;
-  const gen = document.getElementById("generated");
-  const list = document.getElementById("list");
+  const email=document.getElementById("email").value.trim();
+  const count=+document.getElementById("count").value;
+  const gen=document.getElementById("generated");
+  const list=document.getElementById("list");
 
-  if(!email.endsWith("@gmail.com")){
-    alert("Only Gmail allowed");
-    return;
-  }
+  if(!email.endsWith("@gmail.com")){alert("Only Gmail allowed");return;}
 
-  const name = email.replace("@gmail.com","");
-  mails = [];
-  idx = 0;
-  list.innerHTML = "";
+  const name=email.replace("@gmail.com","");
+  mails=[]; idx=0; list.innerHTML="";
 
   for(let i=0;i<count;i++){
     let v="";
-    for(let c of name){
-      v += Math.random()>.5 ? c.toUpperCase() : c.toLowerCase();
-    }
+    for(let c of name){v+=Math.random()>.5?c.toUpperCase():c.toLowerCase();}
     mails.push(v+"@gmail.com");
   }
-
-  gen.value = mails.join("\n");
+  gen.value=mails.join("\n");
   updateCounter();
 
   mails.forEach((m,i)=>{
     const d=document.createElement("div");
-    d.className="item";
-    d.id="item-"+i;
-    d.textContent=m;
+    d.className="item"; d.id="item-"+i; d.textContent=m;
     list.appendChild(d);
   });
 }
 
 function cutNext(){
-  if(idx >= mails.length){
-    alert("All mails used");
-    return;
-  }
+  if(idx>=mails.length){alert("All mails used");return;}
   navigator.clipboard.writeText(mails[idx]);
-
   document.getElementById("item-"+idx).classList.add("used");
-  idx++;
-  updateCounter();
-  showToast();
+  idx++; updateCounter(); showToast();
 }
 
 function updateCounter(){
-  document.getElementById("counter").textContent =
-    `${idx} / ${mails.length} used`;
+  document.getElementById("counter").textContent=`${idx} / ${mails.length} used`;
 }
-
 function showToast(){
   const t=document.getElementById("toast");
-  t.classList.add("show");
-  setTimeout(()=>t.classList.remove("show"),900);
+  t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),900);
+}
+
+/* POPUP LOGIC */
+const pop=document.getElementById("pop");
+if(!localStorage.getItem("tg_joined")){
+  window.addEventListener("load",()=>setTimeout(()=>pop.classList.add("show"),600));
+}
+function joined(){
+  localStorage.setItem("tg_joined","yes");
+  pop.classList.remove("show");
 }
 </script>
 </body>
