@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Premium Gmail Generator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+:root{
+  --primary:#4f46e5;
+  --dark:#0f172a;
+  --light:#f8fafc;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family: "Inter", system-ui, sans-serif;
+  background: linear-gradient(135deg,#0f172a,#020617);
+  color:white;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* CARD */
+.card{
+  width:100%;
+  max-width:420px;
+  background:rgba(255,255,255,.06);
+  backdrop-filter: blur(18px);
+  border-radius:20px;
+  padding:25px;
+  box-shadow:0 20px 60px rgba(0,0,0,.4);
+  animation:fadeUp .8s ease;
+}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(40px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+h1{
+  text-align:center;
+  margin-bottom:5px;
+}
+.subtitle{
+  text-align:center;
+  opacity:.7;
+  margin-bottom:20px;
+}
+
+input,textarea,button{
+  width:100%;
+  margin-top:12px;
+  padding:14px;
+  border-radius:12px;
+  border:none;
+  font-size:15px;
+}
+
+input,textarea{
+  background:#020617;
+  color:white;
+  outline:none;
+}
+
+button{
+  background:var(--primary);
+  color:white;
+  cursor:pointer;
+  font-weight:600;
+  transition:.3s;
+}
+
+button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 30px rgba(79,70,229,.6);
+}
+
+textarea{
+  height:160px;
+  resize:none;
+}
+
+/* POPUP */
+.popup{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+
+.popup.active{display:flex}
+
+.popup-box{
+  background:#020617;
+  padding:25px;
+  border-radius:16px;
+  width:90%;
+  max-width:320px;
+  text-align:center;
+  animation:zoom .4s ease;
+}
+
+@keyframes zoom{
+  from{transform:scale(.7);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+
+.popup a{
+  display:block;
+  margin-top:15px;
+  padding:12px;
+  background:var(--primary);
+  color:white;
+  border-radius:10px;
+  text-decoration:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h1>Gmail Generator</h1>
+  <div class="subtitle">Premium Tool</div>
+
+  <input id="email" placeholder="example@gmail.com">
+  <input id="count" type="number" value="20">
+
+  <button onclick="generate()">Generate</button>
+
+  <textarea id="output" placeholder="Generated emails..."></textarea>
+
+  <button onclick="copyAll()">Copy All</button>
+</div>
+
+<!-- POPUP -->
+<div class="popup" id="popup">
+  <div class="popup-box">
+    <h3>Join Our Channel 🔥</h3>
+    <p>Premium tools & updates</p>
+    <a href="https://t.me/yourchannel" target="_blank">Join Now</a>
+    <br>
+    <button onclick="closePopup()">Later</button>
+  </div>
+</div>
+
+<script>
+function generate(){
+  const email=document.getElementById("email").value.trim();
+  const count=document.getElementById("count").value;
+  const out=document.getElementById("output");
+
+  if(!email.endsWith("@gmail.com")){
+    alert("Only Gmail supported");
+    return;
+  }
+
+  const name=email.replace("@gmail.com","");
+  let res="";
+  for(let i=1;i<=count;i++){
+    res+=name+"."+i+"@gmail.com\n";
+  }
+  out.value=res;
+
+  // popup after generate
+  setTimeout(()=>{document.getElementById("popup").classList.add("active")},600);
+}
+
+function copyAll(){
+  const out=document.getElementById("output");
+  out.select();
+  document.execCommand("copy");
+}
+
+function closePopup(){
+  document.getElementById("popup").classList.remove("active");
+}
+</script>
+
+</body>
+</html>
